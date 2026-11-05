@@ -8,29 +8,30 @@ from .config import Config
 
 from typing import cast
 
-CONFIG = Config.sync_config(__package__)
-TOOLS = AgentTools()
 
-URL = CONFIG.url.rstrip("/")
-TOKEN = CONFIG.token
-ADMIN_GROUPS = set(CONFIG.admin_groups)
-OWNER_GROUPS = set(CONFIG.onwer_groups)
-GROUP_MANAGE = "group_manage"
-ADMIN_TOOLIST = "mute_member", "kick_member"
-OWNER_TOOLIST = "mute_member", "kick_member", "set_special_title", "set_group_admin"
+def create_tools(config: Config):
+    admin_groups = set(config.admin_groups)
+    onwer_groups = set(config.onwer_groups)
+    if not (admin_groups or onwer_groups):
+        return
+    URL = config.url.rstrip("/")
+    TOKEN = config.token
+    GROUP_MANAGE = "group_manage"
+    ADMIN_TOOLIST = "mute_member", "kick_member"
+    OWNER_TOOLIST = "mute_member", "kick_member", "set_special_title", "set_group_admin"
 
-if ADMIN_GROUPS or OWNER_GROUPS:
+    tools = AgentTools()
 
-    @TOOLS.on_intro(ON_CHAT)
-    @TOOLS.create_category(GROUP_MANAGE, "群管理工具")
+    @tools.on_intro(ON_CHAT)
+    @tools.create_category(GROUP_MANAGE, "群管理工具")
     async def _(agent: CloversAgent, turn: Turn, event: Event):
         group_id = event.group_id
         if not group_id:
             return ""
-        if group_id in OWNER_GROUPS:
+        if group_id in onwer_groups:
             permission = "群主"
             turn.extend_tools(agent.tool_manifest[x] for x in OWNER_TOOLIST)
-        elif group_id in ADMIN_GROUPS:
+        elif group_id in admin_groups:
             permission = "管理员"
             turn.extend_tools(agent.tool_manifest[x] for x in ADMIN_TOOLIST)
         else:
@@ -39,7 +40,7 @@ if ADMIN_GROUPS or OWNER_GROUPS:
 你在当前群的权限为 {permission}
 当用户提出群管理请求时，直接调用对应工具。工具会自动校验权限并获取消息中 @ 的成员信息，无需自行解析或重复询问。"""
 
-    @TOOLS.register(
+    @tools.register(
         "mute_member",
         "为用户 @ 的成员设置禁言",
         {"duration": {"type": "integer", "description": "禁言时长（秒），0为取消禁言"}},
@@ -68,7 +69,7 @@ if ADMIN_GROUPS or OWNER_GROUPS:
         else:
             return f"已成功解除 {len(at_users)} 个用户的禁言"
 
-    @TOOLS.register(
+    @tools.register(
         "kick_member",
         "将用户 @ 的成员移出群聊",
         category=HIDDEN_CATEGORY,
@@ -93,7 +94,7 @@ if ADMIN_GROUPS or OWNER_GROUPS:
             resp.raise_for_status()
         return f"已将 {len(at_users)} 个用户踢出群聊"
 
-    @TOOLS.register(
+    @tools.register(
         "set_group_admin",
         "为用户 @ 的成员设置或取消管理员权限",
         {"enable": {"type": "boolean", "description": "设置/取消"}},
@@ -122,7 +123,7 @@ if ADMIN_GROUPS or OWNER_GROUPS:
         else:
             return f"已取消 {len(at_users)} 个用户的管理员权限"
 
-    @TOOLS.register(
+    @tools.register(
         "set_special_title",
         "为群内成员设置专属头衔。若不填写 title 字段则表示删除该成员的头衔。",
         {"title": {"type": "string", "description": "最长6个字符"}},
@@ -147,3 +148,8 @@ if ADMIN_GROUPS or OWNER_GROUPS:
             return f"已将 {event.nickname} 的群头衔设置为 {title}"
         else:
             return f"已删除 {event.nickname} 的群头衔"
+
+    return tools
+
+
+TOOLS = create_tools(Config.sync_config(__package__))
