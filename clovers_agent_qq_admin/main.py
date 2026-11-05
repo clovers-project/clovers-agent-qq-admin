@@ -23,7 +23,7 @@ def create_tools(config: Config):
     tools = AgentTools()
 
     @tools.on_intro(ON_CHAT)
-    @tools.create_category(GROUP_MANAGE, "群管理工具")
+    @tools.create_category(GROUP_MANAGE, "群管理工具，包含禁言、踢人、设置管理员、头衔等工具")
     async def _(agent: CloversAgent, turn: Turn, event: Event):
         group_id = event.group_id
         if not group_id:
