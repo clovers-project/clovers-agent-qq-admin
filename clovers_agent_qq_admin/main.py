@@ -38,7 +38,7 @@ def create_tools(config: Config):
             return ""
         return f"""\
 你在当前群的权限为 {permission}
-当用户提出群管理请求时，直接调用对应工具。工具会自动校验权限并获取消息中 @ 的成员信息，无需自行解析或重复询问。"""
+当用户提出群管理请求时，直接调用对应工具。工具会自动校验权限并获取消息中 @ 的成员信息，无需自行解析或重复确认。"""
 
     @tools.register(
         "mute_member",
