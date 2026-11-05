@@ -16,11 +16,13 @@ TOKEN = CONFIG.token
 @TOOLS.register(
     "set_special_title",
     "为群内成员设置专属头衔。若不填写 title 字段则表示删除该成员的头衔。",
-    {"title": {"type": "string"}},
+    {"title": {"type": "string", "description": "最长6个字符"}},
     category=ON_CHAT,
     required=[],
 )
 async def _(agent: CloversAgent, turn: Turn, event: Event, title: str = ""):
+    if len(title) > 6:
+        return "头衔长度不能超过6个字符"
     group_id = event.group_id
     if not group_id:
         return "当前对话不是群聊"
