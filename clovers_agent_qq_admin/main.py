@@ -22,7 +22,8 @@ OWNER_TOOLIST = "mute_member", "kick_member", "set_special_title", "set_group_ad
 if ADMIN_GROUPS or OWNER_GROUPS:
 
     @TOOLS.on_intro(ON_CHAT)
-    async def intro(agent: CloversAgent, turn: Turn, event: Event):
+    @TOOLS.create_category(GROUP_MANAGE, "群管理工具")
+    async def _(agent: CloversAgent, turn: Turn, event: Event):
         group_id = event.group_id
         if not group_id:
             return ""
@@ -38,15 +39,11 @@ if ADMIN_GROUPS or OWNER_GROUPS:
 你在当前群的权限为 {permission}
 当用户提出群管理请求时，直接调用对应工具。工具会自动校验权限并获取消息中 @ 的成员信息，无需自行解析或重复询问。"""
 
-    @TOOLS.create_category(GROUP_MANAGE, "群管理工具")
-    async def _(agent: CloversAgent, turn: Turn, event: Event):
-        return await intro(agent, turn, event) or "你在本群没有群管理权限"
-
     @TOOLS.register(
         "mute_member",
         "为用户 @ 的成员设置禁言",
         {"duration": {"type": "integer", "description": "禁言时长（秒），0为取消禁言"}},
-        category=GROUP_MANAGE,
+        category=HIDDEN_CATEGORY,
     )
     async def _(agent: CloversAgent, turn: Turn, event: Event, duration: int):
         permission = cast(int, await event.call("permission"))  # type: ignore
@@ -74,7 +71,7 @@ if ADMIN_GROUPS or OWNER_GROUPS:
     @TOOLS.register(
         "kick_member",
         "将用户 @ 的成员移出群聊",
-        category=GROUP_MANAGE,
+        category=HIDDEN_CATEGORY,
     )
     async def _(agent: CloversAgent, turn: Turn, event: Event, duration: int):
         permission = cast(int, await event.call("permission"))  # type: ignore
