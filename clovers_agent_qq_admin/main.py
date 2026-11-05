@@ -18,7 +18,7 @@ def create_tools(config: Config):
     TOKEN = config.token
     GROUP_MANAGE = "group_manage"
     ADMIN_TOOLIST = "mute_member", "kick_member"
-    OWNER_TOOLIST = "mute_member", "kick_member", "set_special_title", "set_group_admin"
+    OWNER_TOOLIST = "mute_member", "kick_member", "set_group_admin", "set_special_title"
 
     tools = AgentTools()
 
@@ -38,7 +38,7 @@ def create_tools(config: Config):
             return ""
         return f"""\
 你在当前群的权限为 {permission}
-当用户提出群管理请求时，直接调用对应工具。工具会自动校验权限并获取消息中 @ 的成员信息，无需自行解析或重复确认。"""
+当用户提出群管理请求时直接调用对应工具。工具会自动校验权限并获取消息中 @ 的成员信息，无需确认对象。"""
 
     @tools.register(
         "mute_member",
