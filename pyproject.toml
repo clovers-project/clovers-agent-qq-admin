@@ -1,10 +1,10 @@
 [project]
-name = "clovers-agent-qq-admin"
-version = "0.1.0"
+name = "clovers-agent-onebot-v11"
+dynamic = ["version"]
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = [
-    "clovers-agent>=0.3.5",
-    "pydantic>=2.14.3",
-]
+dependencies = ["clovers-agent>=0.3.5", "pydantic>=2.14.3"]
+
+[tool.hatch.version]
+path = "clovers_agent_onebot_v11/__init__.py"
