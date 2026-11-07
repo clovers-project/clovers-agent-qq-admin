@@ -1,14 +1,12 @@
 import asyncio
 from clovers_agent import CloversAgent, Turn, Event
 from clovers_agent.constants import ON_CHAT, HIDDEN_CATEGORY
-from .base import TOOLS, CONFIG, on_onebot_v11
+from .base import TOOLS, CONFIG, on_onebot_v11, URL, TOKEN
 
 from typing import cast
 
 OWNER_GROUPS = set(CONFIG.onwer_groups)
 if OWNER_GROUPS:
-    URL = CONFIG.url.rstrip("/")
-    TOKEN = CONFIG.token
     TOOLIST = "set_group_admin", "set_special_title"
 
     @TOOLS.on_intro(ON_CHAT)
